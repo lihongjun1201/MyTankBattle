@@ -217,6 +217,9 @@ ModelManifest.xml
 # =============== #
 Temp/
 Library/
+Obj/
+UnityGenerated/
+Assets/AssetStoreTools*
 
 # ===================================== #
 # Visual Studio / MonoDevelop generated #

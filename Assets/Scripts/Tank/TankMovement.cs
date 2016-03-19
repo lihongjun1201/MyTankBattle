@@ -8,8 +8,6 @@ using UnityEngine;
 ///4.控制左右转向 
 /// </summary>
 
-
-
 public class TankMovement : MonoBehaviour
 {
     public int mPlayerNumber = 1;     //user no.
@@ -114,6 +112,3 @@ public class TankMovement : MonoBehaviour
 
   
 }
-
-
-
