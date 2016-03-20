@@ -101,11 +101,8 @@ public class TankMovement : MonoBehaviour
         m_RigidBodyTank.MovePosition(m_RigidBodyTank.position + (transform.forward * m_MoveSpeed * m_MoveInputValue * Time.deltaTime));
 
         //turn around
-        float turnValue = m_TurnInputValue * m_TurnSpeed * Time.deltaTime;
-        Quaternion turn = Quaternion.Euler(0f, turnValue, 0f);
+        Quaternion turn = Quaternion.Euler(0f, m_TurnInputValue * m_TurnSpeed * Time.deltaTime, 0f);
         m_RigidBodyTank.MoveRotation(m_RigidBodyTank.rotation * turn);
-       
-    
     }
 }
 
