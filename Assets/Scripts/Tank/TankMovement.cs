@@ -6,109 +6,108 @@ using UnityEngine;
 ///2.初始化音乐资源 
 ///3.控制前后移动
 ///4.控制左右转向 
+///5.控制坦克音效转变
 /// </summary>
 
 public class TankMovement : MonoBehaviour
 {
-    public int mPlayerNumber = 1;     //user no.
-    public float mMoveSpeed = 12f;     // tank move speed   
-    public float mTurnSpeed = 180f;       //tank turn speed
-    public float mPitchRange = 0.2f;      //the different pitch of the sound of the engine 
+    public int m_PlayerNo = 1;
+    public float m_MoveSpeed = 12f;
+    public float m_TurnSpeed = 180f;
 
-    public AudioSource mMovementAudio;
-    public AudioClip mEngineIdling;         // when a tank is stationary 
-    public AudioClip mEngineDriving;         // when a tank is moving
+    //sound sources
+    public AudioSource m_AudioSource;
+    public AudioClip m_EngineIding;
+    public AudioClip m_EngineDriving;
+    public float m_PitchRange = 0.2f;
+    
 
-    private string mMovementAxisName;      // the name of the vertical Axis
-    private string mTurnAxisName;     // the name of the horizontal Axis
-    private Rigidbody mRigidBodyTank;           //the rigidbody of tank
+    private Rigidbody m_RigidBodyTank;
 
-    private float mMovementInputValue;     // the current value of forward of backward move
-    private float mTurnInputValue;
-    private float mOriginalPitch;       //the pitch of sound at the start
+    private float m_MoveInputValue;
+    private float m_TurnInputValue;
+    private string m_MoveAxixOfPlayer;
+    private string m_TurnAxixOfPlayer;
+    private float m_originPitch;
 
-
+    /// <summary>
+    ///recall before start ,basic init
+    /// </summary>
     void Awake()
     {
-        mRigidBodyTank = GetComponent<Rigidbody>();
+        m_RigidBodyTank = GetComponent<Rigidbody>();
+        m_MoveInputValue = 0f;
+        m_TurnInputValue = 0f;
     }
 
     private void OnEnable()
     {
-        mRigidBodyTank.isKinematic = false;
-        mMovementInputValue = 0f;
-        mTurnInputValue = 0f;
+        m_RigidBodyTank.isKinematic = false;
     }
 
     private void Disable()
     {
-        mRigidBodyTank.isKinematic = true;
+        m_RigidBodyTank.isKinematic = true;
     }
 
     private void Start()
     {
-        mMovementAxisName = "Vertical" + mPlayerNumber;
-        mTurnAxisName = "Horizontal" + mPlayerNumber;
-        mOriginalPitch = mMovementAudio.pitch;            //get the original pitch of the sound
+        m_MoveAxixOfPlayer = "Vertical" + m_PlayerNo;
+        m_TurnAxixOfPlayer = "Horizontal" + m_PlayerNo;
+        m_originPitch = m_AudioSource.pitch;
     }
 
-    //every frame ,usually updates none physic things
     void Update()
     {
-        //get user input
-        mMovementInputValue = Input.GetAxis(mMovementAxisName);
-        mTurnInputValue = Input.GetAxis(mTurnAxisName);
- 
-        EngineAudio();
+        m_MoveInputValue = Input.GetAxis(m_MoveAxixOfPlayer);     // press w / s
+        m_TurnInputValue = Input.GetAxis(m_TurnAxixOfPlayer);   // press a /a
+
+        changeEngineSound();
     }
 
-    private void EngineAudio()
+    //change the sound of engine with pitch
+    private void changeEngineSound()
     {
-        //if no input, the tank is static
-        if (Mathf.Abs(mMovementInputValue) < 0.1f && Mathf.Abs(mTurnInputValue) < 0.1f)
+        // when no user's input,the tank is idle
+        if (Mathf.Abs(m_MoveInputValue) < 0.1f && Mathf.Abs(m_TurnInputValue) < 0.1f)
         {
-            //if now is playing driving sound
-            if (mMovementAudio.clip == mEngineDriving)
+            //if now is playing driving sound, change to play idlesound
+            if (m_AudioSource.clip == m_EngineDriving)
             {
-                mMovementAudio.clip = mEngineIdling;
-                mMovementAudio.pitch = UnityEngine.Random.Range(mOriginalPitch - mPitchRange, mOriginalPitch + mPitchRange);
-                mMovementAudio.Play();
+                m_AudioSource.clip = m_EngineIding;
+                //change the pitch
+                m_AudioSource.pitch = UnityEngine.Random.Range(m_originPitch - m_PitchRange, m_originPitch + m_PitchRange);
+                //play drivingsound
+                m_AudioSource.Play();
             }
         }
         else
         {
-            if (mMovementAudio.clip == mEngineIdling)
+            if (m_AudioSource.clip == m_EngineIding)
             {
-                mMovementAudio.clip = mEngineDriving;
-                mMovementAudio.pitch = UnityEngine.Random.Range(mOriginalPitch - mPitchRange, mOriginalPitch + mPitchRange);
-                mMovementAudio.Play();
+                m_AudioSource.clip = m_EngineDriving;
+                //change the pitch
+                m_AudioSource.pitch = UnityEngine.Random.Range(m_originPitch - m_PitchRange, m_originPitch + m_PitchRange);
+                //play drivingsound
+                m_AudioSource.Play();
             }
         }
     }
 
+    //always updates physic things in fixed physic time
     void FixedUpdate()
     {
- 
-        move();
-        turn();
+        //move forward or backward
+        m_RigidBodyTank.MovePosition(m_RigidBodyTank.position + (transform.forward * m_MoveSpeed * m_MoveInputValue * Time.deltaTime));
 
+        //turn around
+        float turnValue = m_TurnInputValue * m_TurnSpeed * Time.deltaTime;
+        Quaternion turn = Quaternion.Euler(0f, turnValue, 0f);
+        m_RigidBodyTank.MoveRotation(m_RigidBodyTank.rotation * turn);
+       
+    
     }
-
-    private void move()
-    {
-        Vector3 movement = transform.forward * mMovementInputValue * mMoveSpeed* Time.deltaTime;
-        mRigidBodyTank.MovePosition(mRigidBodyTank.position + movement);
-    }
-
-    private void turn()
-    {
-        float turn = mTurnInputValue * mTurnSpeed * Time.deltaTime;
-        
-        Quaternion turnRotation = Quaternion.Euler(0f, turn, 0f);
-
-        // Apply this rotation to the rigidbody's rotation.
-        mRigidBodyTank.MoveRotation(mRigidBodyTank.rotation * turnRotation);
-    }
-
-  
 }
+
+
+
