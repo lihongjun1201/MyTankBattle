@@ -19,7 +19,7 @@ public class CameraController : MonoBehaviour {
     public float m_MinSize = 6.5f;    //the camera's minest zoomsize 
     public float m_ScreenEdgeBuffer = 4f;    // Space between the top/bottom most target and the screen edge.
 
-    public Transform[] m_TrackTargets ;
+    /*[HideInInspector]*/public Transform[] m_TrackTargets ;
 
     private Camera m_Camera;
     private Vector3 m_MiddlePosOfTanks;
