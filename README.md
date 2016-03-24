@@ -10,3 +10,4 @@
 
 
 ##最终效果图：
+![image](https://github.com/lihongjun1201/MyTankBattle/blob/master/finalGamePic.jpg)
